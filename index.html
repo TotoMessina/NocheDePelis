@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Buscador de Películas</title>
+  <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+
+  <header>
+    <h1>Buscador de Películas</h1>
+  </header>
+
+  <main>
+    <div class="filtros">
+      <label for="nombre">Nombre de la película:</label>
+      <input type="text" id="nombre" placeholder="Buscar por nombre">
+
+      <label for="anio">Año de estreno:</label>
+      <input type="number" id="anio" placeholder="Año">
+
+      <label for="persona">Actor/Directores:</label>
+      <input type="text" id="persona" placeholder="Buscar por actor o director">
+
+      <label for="genero">Género:</label>
+      <select id="genero">
+        <option value="">Selecciona un género</option>
+      </select>
+
+      <label for="plataforma">Plataforma:</label>
+      <select id="plataforma">
+        <option value="">Seleccione plataforma</option>
+        <option value="netflix">Netflix</option>
+        <option value="hulu">Hulu</option>
+        <option value="disneyplus">Disney+</option>
+        <option value="amazon_prime">Amazon Prime Video</option>
+        <option value="apple_tv">Apple TV+</option>
+        <!-- Agregar más plataformas según sea necesario -->
+      </select>
+
+      <label for="orden">Ordenar por:</label>
+      <select id="orden">
+        <option value="popularity.desc">Popularidad (descendente)</option>
+        <option value="release_date.desc">Fecha de estreno (descendente)</option>
+        <option value="vote_average.desc">Calificación (descendente)</option>
+      </select>
+
+      <button id="buscar">Buscar</button>
+    </div>
+
+    <div id="resultados"></div>
+  </main>
+
+  <footer>
+    <p>Hecho por [Tu Nombre] | <a href="mailto:tucorreo@dominio.com">Contáctame</a></p>
+  </footer>
+
+  <script src="script.js"></script>
+</body>
+</html>
