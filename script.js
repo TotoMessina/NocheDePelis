@@ -198,7 +198,7 @@ enviarBtn.addEventListener("click", async () => {
 });
 
 async function obtenerRespuestaChatGPT(pregunta) {
-  const OPENAI_API_KEY = "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"; // Reemplazá con tu clave
+  const OPENAI_API_KEY = "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"; // Reemplazá con tu clave
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
