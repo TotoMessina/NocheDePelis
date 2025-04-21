@@ -19,3 +19,5 @@ Una aplicación web minimalista, al estilo Netflix, para buscar películas utili
 - TMDB API
 
 ## 📦 Estructura del proyecto
+
+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
