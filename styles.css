@@ -618,3 +618,20 @@ footer a:hover {
     grid-template-columns: 1fr;
   }
 }
+
+.trailer-btn {
+  background-color: transparent;
+  border: 1px solid #f5c518;
+  color: #f5c518;
+  padding: 6px 10px;
+  margin-top: 8px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  transition: all 0.3s ease;
+}
+
+.trailer-btn:hover {
+  background-color: #f5c518;
+  color: black;
+}
