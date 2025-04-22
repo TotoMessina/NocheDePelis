@@ -1,82 +1,127 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Buscador de Películas</title>
-  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;600&display=swap" rel="stylesheet">
-  <link rel="stylesheet" href="styles.css">
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>MovieFinder</title>
+  <link rel="stylesheet" href="styles.css" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet" />
 </head>
 <body>
-
-  <header>
-    <h1>🎬 NocheDePelis 🎬</h1>
+  <header class="header">
+    <div class="logo">
+      <img src="logo.png" alt="Logo" class="logo" />
+    </div>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="#">Inicio</a></li>
+        <li><a href="#resultados">Películas</a></li>
+        <li><a href="#favoritos" id="link-favoritos">Favoritos</a></li>
+      </ul>
+    </nav>
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
   </header>
 
   <main>
-    <div class="filtros">
-      <label for="nombre">Nombre de la película:</label>
-      <input type="text" id="nombre" placeholder="Buscar por nombre">
+    <button id="toggle-filtros">🎛 Mostrar filtros</button>
+    <section class="filtros oculto" id="filtros-container">
+      <div class="filtro-item">
+        <label for="nombre">Nombre de la película</label>
+        <input type="text" id="nombre" placeholder="Nombre de la película" />
+      </div>
+    
+      <div class="filtro-item">
+        <label for="persona">Actor / Directores</label>
+        <input type="text" id="persona" placeholder="Actor / Directores" />
+      </div>
+    
+      <div class="filtro-item">
+        <label for="genero">Género</label>
+        <select id="genero">
+          <option value="">Todos los géneros</option>
+        </select>
+      </div>
+    
+      <div class="filtro-item">
+        <label for="plataforma">Plataforma</label>
+        <select id="plataforma">
+          <option value="">En cualquier plataforma</option>
+          <option value="__ninguna__">Sin plataformas</option>
+          <option value="8">Netflix</option>
+          <option value="9">Amazon Prime Video</option>
+          <option value="337">Disney+</option>
+          <option value="15">Hulu</option>
+          <option value="350">Apple TV+</option>
+        </select>
+      </div>
+    
+      <div class="filtro-item">
+        <label for="rango-desde">Año desde:</label>
+        <input type="range" id="rango-desde" min="1950" max="2025" value="2000" />
+        <span id="anio-desde">2000</span>
+      </div>
+    
+      <div class="filtro-item">
+        <label for="rango-hasta">Año hasta:</label>
+        <input type="range" id="rango-hasta" min="1950" max="2025" value="2025" />
+        <span id="anio-hasta">2025</span>
+      </div>
+    
+      <div class="filtro-item">
+        <label for="min-rating">Calificación mínima</label>
+        <select id="min-rating">
+          <option value="">Cualquiera</option>
+          <option value="9">9+</option>
+          <option value="8">8+</option>
+          <option value="7">7+</option>
+          <option value="6">6+</option>
+          <option value="5">5+</option>
+          <option value="4">4+</option>
+        </select>
+      </div>
+    
+      <div class="filtro-item">
+        <label for="orden">Ordenar por</label>
+        <select id="orden">
+          <option value="">Ordenar por</option>
+          <option value="popularity.desc">Popularidad ↓</option>
+          <option value="popularity.asc">Popularidad ↑</option>
+          <option value="release_date.desc">Fecha ↓</option>
+          <option value="release_date.asc">Fecha ↑</option>
+          <option value="vote_average.desc">Calificación ↓</option>
+          <option value="vote_average.asc">Calificación ↑</option>
+        </select>
+      </div>
+    
+      <div class="filtro-item full-width">
+        <button id="buscar">Buscar</button>
+      </div>
+    </section>    
 
-      <label for="anio">Año de estreno:</label>
-      <input type="number" id="anio" placeholder="Año">
+    <button id="random-btn">🎲 Sorpresa</button>
 
-      <div class="filtro-rango">
-        <label for="rango-anio">Rango de año:</label>
-        <div class="rango-wrapper">
-          <span id="anio-desde">2000</span>
-          <input type="range" id="rango-desde" min="1950" max="2025" value="2000">
-          <input type="range" id="rango-hasta" min="1950" max="2025" value="2025">
-          <span id="anio-hasta">2025</span>
-        </div>
-      </div>           
+    <section id="resultados"></section>
+    <div id="paginacion"></div>
 
-      <label for="persona">Actor/Directores:</label>
-      <input type="text" id="persona" placeholder="Buscar por actor o director">
+    <section id="favoritos" class="oculto">
+      <h2>🎬 Tus películas favoritas</h2>
+      <button id="cerrar-favoritos">✖ Cerrar</button>
+      <div id="favoritos-lista"></div>
+    </section>
 
-      <label for="genero">Género:</label>
-      <select id="genero">
-        <option value="">Selecciona un género</option>
-      </select>
-
-      <label for="plataforma">Plataforma:</label>
-      <select id="plataforma">
-        <option value="">En cualquier plataforma</option>
-        <option value="8">Netflix</option>
-        <option value="9">Amazon Prime Video</option>
-        <option value="337">Disney+</option>
-        <option value="15">Hulu</option>
-        <option value="350">Apple TV+</option>
-      </select>
-      
-      <label for="orden">Ordenar por:</label>
-      <select id="orden">
-        <option value="">-- Selecciona un orden --</option>
-        <option value="popularity.desc">Popularidad (descendente)</option>
-        <option value="popularity.asc">Popularidad (ascendente)</option>
-        <option value="release_date.desc">Fecha de estreno (descendente)</option>
-        <option value="release_date.asc">Fecha de estreno (ascendente)</option>
-        <option value="vote_average.desc">Calificación (descendente)</option>
-        <option value="vote_average.asc">Calificación (ascendente)</option>
-      </select>
-
-      <button id="buscar">Buscar</button>
-    </div>
-
-    <div id="chat-container">
+    <section id="chat-container">
       <div id="chat-log"></div>
       <div id="chat-input">
-        <input type="text" id="mensaje" placeholder="Pregúntame por una película...">
+        <input type="text" id="mensaje" placeholder="¿Qué tipo de película te gusta?" />
         <button id="enviar">Enviar</button>
       </div>
-    </div>
-
-    <div id="resultados"></div>
-    <div id="paginacion"></div>
+    </section>
   </main>
 
   <footer>
-    <p>Hecho por Lucas Messina | <a href="mailto:lucastotomessina@gmail.com">Contáctame</a></p>
+    <p>© 2025 MovieFinder. Proyecto demo.</p>
   </footer>
 
   <script src="script.js"></script>

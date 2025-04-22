@@ -18,7 +18,6 @@ const paginacion = document.getElementById("paginacion");
 let paginaActual = 1;
 let totalPaginas = 1;
 
-// Mostrar valores del slider
 rangoDesde.addEventListener("input", () => {
   if (parseInt(rangoDesde.value) > parseInt(rangoHasta.value)) {
     rangoDesde.value = rangoHasta.value;
@@ -51,6 +50,7 @@ async function buscarPeliculas(pagina = 1) {
   const persona = document.getElementById("persona").value;
   const genero = generoSelect.value;
   const plataforma = plataformaSelect.value;
+  const minRating = document.getElementById("min-rating").value;
   const orden = document.getElementById("orden").value;
 
   const desde = rangoDesde.value;
@@ -75,7 +75,7 @@ async function buscarPeliculas(pagina = 1) {
   if (genero) url.searchParams.set("with_genres", genero);
   if (orden) url.searchParams.set("sort_by", orden);
   if (personaID) url.searchParams.set("with_people", personaID);
-  if (plataforma) {
+  if (plataforma && plataforma !== "__ninguna__") {
     url.searchParams.set("with_watch_providers", plataforma);
     url.searchParams.set("watch_region", "AR");
   }
@@ -83,7 +83,7 @@ async function buscarPeliculas(pagina = 1) {
   if (hasta) url.searchParams.set("primary_release_date.lte", `${hasta}-12-31`);
 
   let res;
-  if (nombre && !plataforma) {
+  if (nombre && (!plataforma || plataforma === "__ninguna__")) {
     res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&language=es-ES&query=${nombre}&page=${pagina}`);
   } else {
     res = await fetch(url.toString());
@@ -100,15 +100,21 @@ async function buscarPeliculas(pagina = 1) {
   resultados.innerHTML = "";
   totalPaginas = data.total_pages;
 
-  for (const pelicula of data.results) {
+  let visibles = 0;
+  let index = 0;
+
+  while (visibles < 20 && index < data.results.length) {
+    const pelicula = data.results[index];
+    index++;
+
     const proveedorRes = await fetch(`${BASE_URL}/movie/${pelicula.id}/watch/providers?api_key=${API_KEY}`);
     const proveedorData = await proveedorRes.json();
     const plataformas = proveedorData.results?.AR?.flatrate;
+    const sinPlataformas = !plataformas || plataformas.length === 0;
 
-    // NUEVO: Si no se seleccionó plataforma, solo mostrar si tiene al menos una disponible
-    if (!plataforma && (!plataformas || plataformas.length === 0)) {
-      continue;
-    }
+    if (plataforma === "__ninguna__" && !sinPlataformas) continue;
+    if (plataforma === "" && sinPlataformas) continue;
+    if (minRating && pelicula.vote_average < parseFloat(minRating)) continue;
 
     const plataformasDisponibles = plataformas?.map(p => p.provider_name).join(", ") || "No disponible";
 
@@ -119,9 +125,13 @@ async function buscarPeliculas(pagina = 1) {
       <img src="${pelicula.poster_path ? IMG_URL + pelicula.poster_path : DEFAULT_IMG}" alt="${pelicula.title}">
       <div class="pelicula-info">
         <h3>${pelicula.title}</h3>
+        <div class="hover-overlay">
+          <span class="rating">⭐ ${pelicula.vote_average.toFixed(1)}</span>
+        </div>
         <p>Estreno: ${pelicula.release_date || "Desconocido"}</p>
         <p class="descripcion-corta">${pelicula.overview ? pelicula.overview.slice(0, 120) + "..." : "Sin descripción."}</p>
         <button class="ver-mas">Ver más</button>
+        <button class="favorito-btn">❤️ Favorito</button>
         <p class="plataformas">Disponible en: ${plataformasDisponibles}</p>
       </div>
     `;
@@ -144,7 +154,27 @@ async function buscarPeliculas(pagina = 1) {
       });
     });
 
+    // FAVORITOS
+    const favoritoBtn = div.querySelector(".favorito-btn");
+    const clave = `fav_${pelicula.id}`;
+    const yaEsFavorita = localStorage.getItem(clave);
+
+    if (yaEsFavorita) {
+      favoritoBtn.textContent = "💔 Quitar";
+    }
+
+    favoritoBtn.addEventListener("click", () => {
+      if (localStorage.getItem(clave)) {
+        localStorage.removeItem(clave);
+        favoritoBtn.textContent = "❤️ Favorito";
+      } else {
+        localStorage.setItem(clave, JSON.stringify(pelicula));
+        favoritoBtn.textContent = "💔 Quitar";
+      }
+    });
+
     resultados.appendChild(div);
+    visibles++;
   }
 
   renderizarPaginacion();
@@ -177,8 +207,7 @@ function renderizarPaginacion() {
 buscarBtn.addEventListener("click", () => buscarPeliculas(1));
 window.addEventListener("DOMContentLoaded", cargarGeneros);
 
-// ==================== CHATGPT CON OPENAI ====================
-
+// ========== CHAT CON OPENAI ==========
 const enviarBtn = document.getElementById("enviar");
 const mensajeInput = document.getElementById("mensaje");
 const chatLog = document.getElementById("chat-log");
@@ -198,7 +227,7 @@ enviarBtn.addEventListener("click", async () => {
 });
 
 async function obtenerRespuestaChatGPT(pregunta) {
-  const OPENAI_API_KEY = "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"; // Reemplazá con tu clave
+  const OPENAI_API_KEY = "sk-tu-api-key-aquí"; // ← Cambiá por tu API real
 
   const response = await fetch("https://api.openai.com/v1/chat/completions", {
     method: "POST",
@@ -224,3 +253,117 @@ async function obtenerRespuestaChatGPT(pregunta) {
   const data = await response.json();
   return data.choices?.[0]?.message?.content || "Lo siento, no pude procesar tu consulta.";
 }
+
+// ========== MENÚ RESPONSIVE ==========
+const menuToggle = document.getElementById("menu-toggle");
+const nav = document.getElementById("nav");
+
+menuToggle.addEventListener("click", () => {
+  nav.classList.toggle("active");
+});
+
+const randomBtn = document.getElementById("random-btn");
+
+randomBtn.addEventListener("click", async () => {
+  resultados.innerHTML = "Buscando una película al azar...";
+
+  const totalPages = 500; // límite de la API
+  const randomPage = Math.floor(Math.random() * totalPages) + 1;
+
+  const res = await fetch(`${BASE_URL}/discover/movie?api_key=${API_KEY}&language=es-ES&page=${randomPage}`);
+  const data = await res.json();
+
+  if (!data.results.length) {
+    resultados.innerHTML = "<p>No se encontró una película aleatoria.</p>";
+    return;
+  }
+
+  const randomIndex = Math.floor(Math.random() * data.results.length);
+  const pelicula = data.results[randomIndex];
+
+  const proveedorRes = await fetch(`${BASE_URL}/movie/${pelicula.id}/watch/providers?api_key=${API_KEY}`);
+  const proveedorData = await proveedorRes.json();
+  const plataformas = proveedorData.results?.AR?.flatrate;
+  const plataformasDisponibles = plataformas?.map(p => p.provider_name).join(", ") || "No disponible";
+
+  resultados.innerHTML = "";
+
+  const div = document.createElement("div");
+  div.classList.add("pelicula");
+
+  div.innerHTML = `
+    <img src="${pelicula.poster_path ? IMG_URL + pelicula.poster_path : DEFAULT_IMG}" alt="${pelicula.title}">
+    <div class="pelicula-info">
+      <h3>${pelicula.title}</h3>
+      <div class="hover-overlay">
+        <span class="rating">⭐ ${pelicula.vote_average.toFixed(1)}</span>
+      </div>
+      <p>Estreno: ${pelicula.release_date || "Desconocido"}</p>
+      <p class="descripcion-corta">${pelicula.overview ? pelicula.overview.slice(0, 120) + "..." : "Sin descripción."}</p>
+      <button class="ver-mas">Ver más</button>
+      <button class="favorito-btn">❤️ Favorito</button>
+      <p class="plataformas">Disponible en: ${plataformasDisponibles}</p>
+    </div>
+  `;
+
+  resultados.appendChild(div);
+});
+
+function mostrarFavoritos() {
+  const contenedor = document.getElementById("favoritos-lista");
+  const favoritosSection = document.getElementById("favoritos");
+  contenedor.innerHTML = "";
+
+  const claves = Object.keys(localStorage).filter(k => k.startsWith("fav_"));
+
+  if (claves.length === 0) {
+    contenedor.innerHTML = "<p>No tenés películas favoritas aún.</p>";
+    favoritosSection.classList.remove("oculto");
+    return;
+  }
+
+  claves.forEach(clave => {
+    const peli = JSON.parse(localStorage.getItem(clave));
+
+    const div = document.createElement("div");
+    div.classList.add("pelicula");
+
+    div.innerHTML = `
+      <img src="${peli.poster_path ? IMG_URL + peli.poster_path : DEFAULT_IMG}" alt="${peli.title}">
+      <div class="pelicula-info">
+        <h3>${peli.title}</h3>
+        <span class="rating">⭐ ${peli.vote_average.toFixed(1)}</span>
+        <p>${peli.release_date}</p>
+        <button class="quitar-fav">💔 Quitar</button>
+      </div>
+    `;
+
+    div.querySelector(".quitar-fav").addEventListener("click", () => {
+      localStorage.removeItem(clave);
+      mostrarFavoritos(); // refrescar
+    });
+
+    contenedor.appendChild(div);
+  });
+
+  favoritosSection.classList.remove("oculto");
+}
+
+document.getElementById("link-favoritos").addEventListener("click", (e) => {
+  e.preventDefault();
+  mostrarFavoritos();
+});
+
+document.getElementById("cerrar-favoritos").addEventListener("click", () => {
+  document.getElementById("favoritos").classList.add("oculto");
+});
+
+const toggleFiltros = document.getElementById("toggle-filtros");
+const filtrosContainer = document.getElementById("filtros-container");
+
+toggleFiltros.addEventListener("click", () => {
+  filtrosContainer.classList.toggle("oculto");
+  toggleFiltros.textContent = filtrosContainer.classList.contains("oculto")
+    ? "🎛 Mostrar filtros"
+    : "🔽 Ocultar filtros";
+});
