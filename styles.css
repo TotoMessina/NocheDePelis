@@ -635,3 +635,248 @@ footer a:hover {
   background-color: #f5c518;
   color: black;
 }
+
+.spinner {
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #555;
+  border-radius: 50%;
+  width: 50px;
+  height: 50px;
+  animation: girar 1s linear infinite;
+  margin: 40px auto;
+}
+
+@keyframes girar {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+/* Estilo del contenedor de la imagen */
+.image-container {
+  position: relative;
+  display: inline-block;
+}
+
+/* Círculo de carga (spinner) */
+.loader {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  transform: translate(-50%, -50%);
+  border: 6px solid #f3f3f3;
+  border-top: 6px solid #3498db;
+  border-radius: 50%;
+  width: 40px;
+  height: 40px;
+  animation: spin 1s linear infinite;
+}
+
+/* Animación de rotación */
+@keyframes spin {
+  0% { transform: translate(-50%, -50%) rotate(0deg); }
+  100% { transform: translate(-50%, -50%) rotate(360deg); }
+}
+
+/* Ocultar la imagen hasta que se cargue */
+.image {
+  display: none;
+  width: 100%;
+  height: auto;
+}
+
+/* ===== Favoritos Page ===== */
+#favoritos {
+  padding: 30px;
+  background-color: #111;
+  min-height: 100vh;
+}
+
+#favoritos h2 {
+  color: white;
+  margin-bottom: 20px;
+  text-align: center;
+  font-size: 24px;
+}
+
+#favoritos-lista {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(180px, 1fr));
+  gap: 20px;
+}
+
+.pelicula {
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+}
+
+.pelicula:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+}
+
+.pelicula-info {
+  padding: 12px;
+}
+
+.pelicula-info h3 {
+  color: #fff;
+  font-size: 18px;
+  margin-bottom: 10px;
+}
+
+.rating {
+  color: #f5c518;
+  font-weight: bold;
+}
+
+.descripcion-corta {
+  color: #ccc;
+  font-size: 14px;
+  margin: 10px 0;
+  min-height: 60px;
+}
+
+.ver-mas,
+.ver-menos,
+.quitar-fav {
+  background-color: transparent;
+  border: 1px solid #e50914;
+  color: white;
+  padding: 6px 10px;
+  border-radius: 4px;
+  cursor: pointer;
+  font-size: 14px;
+  margin: 5px;
+  transition: background 0.3s ease;
+}
+
+.ver-mas:hover,
+.ver-menos:hover,
+.quitar-fav:hover {
+  background-color: #e50914;
+  color: white;
+}
+
+/* Responsive */
+@media (max-width: 600px) {
+  #favoritos-lista {
+    grid-template-columns: 1fr;
+  }
+}
+
+.section-title {
+  text-align: center;
+  font-size: 26px;
+  color: white;
+  margin: 30px auto 20px;
+}
+
+.header {
+  background-color: #111;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 15px 30px;
+  border-bottom: 2px solid #e50914;
+}
+
+.logo {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+}
+
+.logo img {
+  height: 40px;
+}
+
+.logo span {
+  color: white;
+  font-size: 20px;
+  font-weight: bold;
+}
+
+.nav ul {
+  list-style: none;
+  display: flex;
+  gap: 20px;
+}
+
+.nav a {
+  color: white;
+  text-decoration: none;
+  font-weight: 500;
+  font-size: 16px;
+}
+
+.nav a:hover {
+  color: #e50914;
+}
+
+/* Hamburguesa */
+.menu-toggle {
+  display: none;
+  flex-direction: column;
+  gap: 4px;
+  cursor: pointer;
+}
+
+.menu-toggle span {
+  background-color: white;
+  height: 2px;
+  width: 20px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+  .nav ul {
+    flex-direction: column;
+    position: absolute;
+    top: 60px;
+    right: 0;
+    background-color: #111;
+    padding: 20px;
+    display: none;
+  }
+
+  .nav.active ul {
+    display: flex;
+  }
+
+  .menu-toggle {
+    display: flex;
+  }
+}
+
+.pelicula {
+  background-color: #1c1c1c;
+  border-radius: 10px;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+  text-align: center;
+}
+
+.pelicula:hover {
+  transform: scale(1.03);
+  box-shadow: 0 0 15px rgba(229, 9, 20, 0.3);
+}
+
+.pelicula-info {
+  padding: 12px;
+  color: white;
+}
+
+.rating {
+  color: #f5c518;
+  font-weight: bold;
+}
+
+button {
+  font-family: inherit;
+}

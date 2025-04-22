@@ -110,6 +110,64 @@ function renderizarPaginacion() {
   }
 }
 
+// ========== Película aleatoria ==========
+const randomBtn = document.getElementById("random-btn");
+
+randomBtn.addEventListener("click", async () => {
+  resultados.innerHTML = "<div class='spinner'></div><p style='text-align:center;'>Buscando película sorpresa...</p>";
+
+  const genero = generoSelect.value;
+  const plataforma = plataformaSelect.value;
+  const orden = document.getElementById("orden").value;
+  const minRating = document.getElementById("min-rating").value;
+  const desde = rangoDesde.value;
+  const hasta = rangoHasta.value;
+
+  const urlBase = new URL(`${BASE_URL}/discover/movie`);
+  urlBase.searchParams.set("api_key", API_KEY);
+  urlBase.searchParams.set("language", "es-ES");
+
+  if (genero) urlBase.searchParams.set("with_genres", genero);
+  if (orden) urlBase.searchParams.set("sort_by", orden);
+  if (plataforma && plataforma !== "__ninguna__") {
+    urlBase.searchParams.set("with_watch_providers", plataforma);
+    urlBase.searchParams.set("watch_region", "AR");
+  }
+  if (desde) urlBase.searchParams.set("primary_release_date.gte", `${desde}-01-01`);
+  if (hasta) urlBase.searchParams.set("primary_release_date.lte", `${hasta}-12-31`);
+
+  // PRIMERA CONSULTA: sin página, solo para saber cuántas hay
+  const res1 = await fetch(urlBase.toString());
+  const data1 = await res1.json();
+  const total = data1.total_results;
+  const totalPages = Math.min(data1.total_pages, 500); // máximo 500 permitido por la API
+
+  if (total === 0) {
+    resultados.innerHTML = "<p>No se encontraron películas que coincidan con los filtros.</p>";
+    return;
+  }
+
+  // Elegir una página al azar válida
+  const paginaRandom = Math.floor(Math.random() * totalPages) + 1;
+  urlBase.searchParams.set("page", paginaRandom);
+
+  const res2 = await fetch(urlBase.toString());
+  const data2 = await res2.json();
+
+  // Aplicar filtro por rating si es necesario
+  const posibles = minRating
+    ? data2.results.filter(p => p.vote_average >= parseFloat(minRating))
+    : data2.results;
+
+  if (!posibles.length) {
+    // Intentar otra página al azar si la actual no tiene resultados válidos
+    return randomBtn.click();
+  }
+
+  const peli = posibles[Math.floor(Math.random() * posibles.length)];
+  renderPeliculas([peli]);
+});
+
 // ========== Inicialización ==========
 buscarBtn.addEventListener("click", () => buscarPeliculas(1));
 window.addEventListener("DOMContentLoaded", cargarGeneros);
