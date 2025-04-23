@@ -61,7 +61,40 @@ async function buscarPeliculas(pagina = 1) {
   url.searchParams.set("api_key", API_KEY);
   url.searchParams.set("language", "es-ES");
   url.searchParams.set("page", pagina);
+  if (nombre) {
+    const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(nombre)}&page=${pagina}`);
+    const data = await res.json();
+    renderPeliculas(data.results);
+    totalPaginas = data.total_pages;
+    paginaActual = pagina;
+    renderizarPaginacion();
+    return;
+  }
 
+  // Si hay persona (actor/director), buscar su ID
+  if (persona) {
+    const resPersona = await fetch(`${BASE_URL}/search/person?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(persona)}`);
+    const dataPersona = await resPersona.json();
+    if (dataPersona.results.length > 0) {
+      const personaId = dataPersona.results[0].id;
+      const url = new URL(`${BASE_URL}/discover/movie`);
+      url.searchParams.set("api_key", API_KEY);
+      url.searchParams.set("language", "es-ES");
+      url.searchParams.set("page", pagina);
+      url.searchParams.set("with_people", personaId);
+
+      const res = await fetch(url.toString());
+      const data = await res.json();
+      renderPeliculas(data.results);
+      totalPaginas = data.total_pages;
+      paginaActual = pagina;
+      renderizarPaginacion();
+      return;
+    } else {
+      resultados.innerHTML = "<p>No se encontró esa persona.</p>";
+      return;
+    }
+  }
   if (genero) url.searchParams.set("with_genres", genero);
   if (orden) url.searchParams.set("sort_by", orden);
   if (plataforma && plataforma !== "__ninguna__") {

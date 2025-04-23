@@ -12,6 +12,7 @@ const orden = document.getElementById("orden");
 const fechaDesde = document.getElementById("fecha-desde");
 const fechaHasta = document.getElementById("fecha-hasta");
 const compania = document.getElementById("compania");
+const filtrarConocidas = document.getElementById("filtrar-conocidas");
 
 
 let paginaActual = 1;
@@ -48,9 +49,11 @@ async function buscarEstrenos(pagina = 1) {
   const res = await fetch(url.toString());
   const data = await res.json();
 
-  const filtradas = minRating.value
-    ? data.results.filter(p => p.vote_average >= parseFloat(minRating.value))
-    : data.results;
+  const filtradas = data.results.filter(p => {
+    const cumpleRating = !minRating.value || p.vote_average >= parseFloat(minRating.value);
+    const esConocida = !filtrarConocidas.checked || (p.popularity > 20 && p.vote_count > 10);
+    return cumpleRating && esConocida;
+  });  
 
   mostrarEstrenos(filtradas);
 
