@@ -17,9 +17,9 @@ const labelHasta = document.getElementById("anio-hasta");
 let paginaActual = 1;
 let totalPaginas = 1;
 
-// ========== Cargar géneros ==========
+// ========== Cargar géneros ========== 
 async function cargarGeneros() {
-  const res = await fetch(`${BASE_URL}/genre/movie/list?api_key=${API_KEY}&language=es-ES`);
+  const res = await fetch(`${BASE_URL}/genre/tv/list?api_key=${API_KEY}&language=es-ES`);
   const data = await res.json();
   data.genres.forEach(g => {
     const option = document.createElement("option");
@@ -29,7 +29,7 @@ async function cargarGeneros() {
   });
 }
 
-// ========== Sliders ==========
+// ========== Sliders ========== 
 rangoDesde.addEventListener("input", () => {
   if (parseInt(rangoDesde.value) > parseInt(rangoHasta.value)) {
     rangoDesde.value = rangoHasta.value;
@@ -44,8 +44,8 @@ rangoHasta.addEventListener("input", () => {
   labelHasta.textContent = rangoHasta.value;
 });
 
-// ========== Buscar películas ==========
-async function buscarPeliculas(pagina = 1) {
+// ========== Buscar series ========== 
+async function buscarSeries(pagina = 1) {
   const nombre = document.getElementById("nombre").value;
   const persona = document.getElementById("persona").value;
   const genero = generoSelect.value;
@@ -57,79 +57,86 @@ async function buscarPeliculas(pagina = 1) {
 
   resultados.innerHTML = "Cargando...";
 
-  const url = new URL(`${BASE_URL}/discover/movie`);
+  const url = new URL(`${BASE_URL}/discover/tv`);
   url.searchParams.set("api_key", API_KEY);
   url.searchParams.set("language", "es-ES");
-  if (genero) url.searchParams.set("with_genres", genero);
-  if (orden) url.searchParams.set("sort_by", orden);
-  if (plataforma && plataforma !== "__ninguna__") {
-    url.searchParams.set("with_watch_providers", plataforma);
-    url.searchParams.set("watch_region", "AR");
-  }
-  if (desde) url.searchParams.set("primary_release_date.gte", `${desde}-01-01`);
-  if (hasta) url.searchParams.set("primary_release_date.lte", `${hasta}-12-31`);
+  url.searchParams.set("page", pagina);
 
-  // Búsqueda por nombre (search/movie) → no permite combinar con discover
   if (nombre) {
-    const res = await fetch(`${BASE_URL}/search/movie?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(nombre)}&page=${pagina}`);
+    const res = await fetch(`${BASE_URL}/search/tv?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(nombre)}&page=${pagina}`);
     const data = await res.json();
-    renderPeliculas(data.results);
+    renderSeries(data.results);
     totalPaginas = data.total_pages;
     paginaActual = pagina;
     renderizarPaginacion();
     return;
   }
 
-  // Búsqueda por persona (actor/director)
   if (persona) {
     const resPersona = await fetch(`${BASE_URL}/search/person?api_key=${API_KEY}&language=es-ES&query=${encodeURIComponent(persona)}`);
     const dataPersona = await resPersona.json();
     if (dataPersona.results.length > 0) {
       const personaId = dataPersona.results[0].id;
       url.searchParams.set("with_people", personaId);
+      const res = await fetch(url.toString());
+      const data = await res.json();
+      renderSeries(data.results);
+      totalPaginas = data.total_pages;
+      paginaActual = pagina;
+      renderizarPaginacion();
+      return;
     } else {
       resultados.innerHTML = "<p>No se encontró esa persona.</p>";
       return;
     }
   }
 
-  try {
-    // Primera página
-    url.searchParams.set("page", pagina);
-    const res1 = await fetch(url.toString());
-    const data1 = await res1.json();
-
-    // Segunda página
-    url.searchParams.set("page", pagina + 1);
-    const res2 = await fetch(url.toString());
-    const data2 = await res2.json();
-
-    // Juntar las primeras 20 + 4 de la siguiente
-    let peliculas = [...data1.results, ...data2.results.slice(0, 4)];
-
-    if (minRating) {
-      peliculas = peliculas.filter(p => p.vote_average >= parseFloat(minRating));
-    }
-
-    renderPeliculas(peliculas);
-    totalPaginas = data1.total_pages;
-    paginaActual = pagina;
-    renderizarPaginacion();
-  } catch (error) {
-    console.error("Error al buscar películas:", error);
-    resultados.innerHTML = "<p>Error al buscar películas.</p>";
+  if (genero) url.searchParams.set("with_genres", genero);
+  if (orden) url.searchParams.set("sort_by", orden);  // Aquí se incluye el orden
+  if (plataforma && plataforma !== "__ninguna__") {
+    url.searchParams.set("with_watch_providers", plataforma);
+    url.searchParams.set("watch_region", "AR");
   }
+  if (desde) url.searchParams.set("first_air_date.gte", `${desde}-01-01`);
+  if (hasta) url.searchParams.set("first_air_date.lte", `${hasta}-12-31`);
+
+  const res = await fetch(url.toString());
+  const data = await res.json();
+
+  const posibles = minRating
+    ? data.results.filter(s => s.vote_average >= parseFloat(minRating))
+    : data.results;
+
+  renderSeries(posibles);
+
+  totalPaginas = data.total_pages;
+  paginaActual = pagina;
+  renderizarPaginacion();
 }
 
-// ========== Paginación ==========
+// ========== Renderizar series ========== 
+function renderSeries(series) {
+  resultados.innerHTML = "";
+  series.forEach(serie => {
+    const div = document.createElement("div");
+    div.classList.add("serie");
+    div.innerHTML = `
+      <img src="${serie.poster_path ? IMG_URL + serie.poster_path : DEFAULT_IMG}" alt="${serie.name}">
+      <h3>${serie.name}</h3>
+      <p>${serie.overview}</p>
+    `;
+    resultados.appendChild(div);
+  });
+}
+
+// ========== Paginación ========== 
 function renderizarPaginacion() {
   paginacion.innerHTML = "";
-
   const crearBoton = (pagina, texto = null) => {
     const btn = document.createElement("button");
     btn.textContent = texto || pagina;
     if (pagina === paginaActual) btn.classList.add("active");
-    btn.addEventListener("click", () => buscarPeliculas(pagina));
+    btn.addEventListener("click", () => buscarSeries(pagina));
     return btn;
   };
 
@@ -146,11 +153,10 @@ function renderizarPaginacion() {
   }
 }
 
-// ========== Película aleatoria ==========
+// ========== Serie aleatoria ========== 
 const randomBtn = document.getElementById("random-btn");
-
 randomBtn.addEventListener("click", async () => {
-  resultados.innerHTML = "<div class='spinner'></div><p style='text-align:center;'>Buscando película sorpresa...</p>";
+  resultados.innerHTML = "<div class='spinner'></div><p>Buscando serie sorpresa...</p>";
 
   const genero = generoSelect.value;
   const plataforma = plataformaSelect.value;
@@ -159,65 +165,45 @@ randomBtn.addEventListener("click", async () => {
   const desde = rangoDesde.value;
   const hasta = rangoHasta.value;
 
-  const urlBase = new URL(`${BASE_URL}/discover/movie`);
+  const urlBase = new URL(`${BASE_URL}/discover/tv`);
   urlBase.searchParams.set("api_key", API_KEY);
   urlBase.searchParams.set("language", "es-ES");
 
   if (genero) urlBase.searchParams.set("with_genres", genero);
-  if (orden) urlBase.searchParams.set("sort_by", orden);
+  if (orden) urlBase.searchParams.set("sort_by", orden); // Aquí también se incluye el orden
   if (plataforma && plataforma !== "__ninguna__") {
     urlBase.searchParams.set("with_watch_providers", plataforma);
     urlBase.searchParams.set("watch_region", "AR");
   }
-  if (desde) urlBase.searchParams.set("primary_release_date.gte", `${desde}-01-01`);
-  if (hasta) urlBase.searchParams.set("primary_release_date.lte", `${hasta}-12-31`);
+  if (desde) urlBase.searchParams.set("first_air_date.gte", `${desde}-01-01`);
+  if (hasta) urlBase.searchParams.set("first_air_date.lte", `${hasta}-12-31`);
 
-  // PRIMERA CONSULTA: sin página, solo para saber cuántas hay
   const res1 = await fetch(urlBase.toString());
   const data1 = await res1.json();
-  const total = data1.total_results;
-  const totalPages = Math.min(data1.total_pages, 500); // máximo 500 permitido por la API
+  const totalPages = Math.min(data1.total_pages, 500); 
 
-  if (total === 0) {
-    resultados.innerHTML = "<p>No se encontraron películas que coincidan con los filtros.</p>";
+  if (data1.total_results === 0) {
+    resultados.innerHTML = "<p>No se encontraron series.</p>";
     return;
   }
 
-  // Elegir una página al azar válida
   const paginaRandom = Math.floor(Math.random() * totalPages) + 1;
   urlBase.searchParams.set("page", paginaRandom);
 
   const res2 = await fetch(urlBase.toString());
   const data2 = await res2.json();
-
-  // Aplicar filtro por rating si es necesario
   const posibles = minRating
-    ? data2.results.filter(p => p.vote_average >= parseFloat(minRating))
+    ? data2.results.filter(s => s.vote_average >= parseFloat(minRating))
     : data2.results;
 
   if (!posibles.length) {
-    // Intentar otra página al azar si la actual no tiene resultados válidos
     return randomBtn.click();
   }
 
-  const peli = posibles[Math.floor(Math.random() * posibles.length)];
-  renderPeliculas([peli]);
+  const serie = posibles[Math.floor(Math.random() * posibles.length)];
+  renderSeries([serie]);
 });
 
-// ========== Inicialización ==========
-buscarBtn.addEventListener("click", () => buscarPeliculas(1));
+// ========== Inicialización ========== 
+buscarBtn.addEventListener("click", () => buscarSeries(1));
 window.addEventListener("DOMContentLoaded", cargarGeneros);
-
-document.getElementById("compartir-noche").addEventListener("click", () => {
-  const mensaje = "¡Estoy armando una noche de peli en https://noche-de-pelis.vercel.app! 🍿🎬";
-  if (navigator.share) {
-    navigator.share({
-      title: "Noche de Pelis",
-      text: mensaje,
-      url: window.location.href
-    }).catch(console.error);
-  } else {
-    navigator.clipboard.writeText(mensaje + "\n" + window.location.href);
-    alert("¡Link copiado para compartir!");
-  }
-});

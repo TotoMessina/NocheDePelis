@@ -1,0 +1,123 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Series Finder</title>
+  <link rel="stylesheet" href="series.css">
+</head>
+<body>
+  <!-- Header -->
+  <header class="header">
+    <div class="logo">
+      <img src="logo.png" alt="Logo" />
+      <span>MovieFinder</span>
+    </div>
+    <nav class="nav" id="nav">
+      <ul>
+        <li><a href="index.html">Inicio</a></li>
+        <li><a href="estrenos.html">Estrenos</a></li>
+        <li><a href="favoritos.html">Favoritos</a></li>
+      </ul>
+    </nav>
+    <div class="menu-toggle" id="menu-toggle">
+      <span></span><span></span><span></span>
+    </div>
+</header>
+
+  <!-- Filtros -->
+  <section class="filtros">
+    <div class="filtro-item">
+      <label for="categoria">Categoría</label>
+      <select id="categoria">
+        <option value="">Seleccionar Categoría</option>
+        <option value="accion">Acción</option>
+        <option value="comedia">Comedia</option>
+        <option value="drama">Drama</option>
+        <option value="romance">Romance</option>
+        <!-- Agrega más categorías según sea necesario -->
+      </select>
+    </div>
+  
+    <div class="filtro-item">
+      <label for="anio">Año</label>
+      <select id="anio">
+        <option value="">Seleccionar Año</option>
+        <option value="2020">2020</option>
+        <option value="2021">2021</option>
+        <option value="2022">2022</option>
+        <option value="2023">2023</option>
+        <!-- Agrega más años según sea necesario -->
+      </select>
+    </div>
+  
+    <div class="filtro-item">
+      <label for="actor">Actor/Actriz</label>
+      <input type="text" id="actor" placeholder="Buscar por actor/actriz">
+    </div>
+  
+    <div class="filtro-item">
+      <label for="calificacion">Calificación</label>
+      <select id="calificacion">
+        <option value="">Seleccionar Calificación</option>
+        <option value="5">5 estrellas</option>
+        <option value="4">4 estrellas</option>
+        <option value="3">3 estrellas</option>
+        <option value="2">2 estrellas</option>
+        <option value="1">1 estrella</option>
+      </select>
+    </div>
+  
+    <div class="filtro-item">
+      <label for="busqueda">Búsqueda</label>
+      <input type="text" id="busqueda" placeholder="Buscar película">
+    </div>
+
+    <select id="orden">
+        <option value="popularity.desc">Más popular</option>
+        <option value="vote_average.desc">Mejor puntuación</option>
+    </select>  
+    <button id="buscar">Buscar</button>
+  
+    <button id="toggle-filtros" class="toggle-filtros">Mostrar Filtros</button>
+  </section>  
+
+
+  <!-- Resultados -->
+  <div id="resultados">
+    <!-- Resultados de series se mostrarán aquí -->
+    <div class="serie">
+      <img src="serie1.jpg" alt="Serie 1">
+      <div class="serie-info">
+        <h3>Serie 1</h3>
+        <p>Descripción breve de la serie.</p>
+        <button class="favorito-btn">Añadir a favoritos</button>
+      </div>
+    </div>
+    <div class="serie">
+      <img src="serie2.jpg" alt="Serie 2">
+      <div class="serie-info">
+        <h3>Serie 2</h3>
+        <p>Descripción breve de la serie.</p>
+        <button class="favorito-btn">Añadir a favoritos</button>
+      </div>
+    </div>
+    <!-- Más resultados de series -->
+  </div>
+
+  <!-- Paginación -->
+  <div id="paginacion">
+    <button>1</button>
+    <button>2</button>
+    <button>3</button>
+  </div>
+
+  <!-- Footer -->
+  <footer>
+    <p>&copy; 2025 Series Finder. Todos los derechos reservados.</p>
+    <a href="#">Política de privacidad</a>
+  </footer>
+
+  <script src="scripts/series.js"></script>
+</body>
+</html>

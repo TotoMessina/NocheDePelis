@@ -3,14 +3,13 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Próximos Estrenos - MovieFinder</title>
+  <title>Próximos Estrenos - MovieNight</title>
   <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
     <header class="header">
         <div class="logo">
           <img src="logo.png" alt="Logo" />
-          <span>MovieFinder</span>
         </div>
         <nav class="nav" id="nav">
           <ul>
@@ -30,67 +29,74 @@
     <button id="toggle-filtros">🎛 Mostrar filtros</button>
 
     <section class="filtros oculto" id="filtros-container">
-      <select id="genero"><option value="">Todos los géneros</option></select>
-      <select id="min-rating">
-        <option value="">Cualquier calificación</option>
-        <option value="9">9+</option>
-        <option value="8">8+</option>
-        <option value="7">7+</option>
-        <option value="6">6+</option>
-        <option value="5">5+</option>
-        <option value="4">4+</option>
-      </select>
-      <label for="compania">Productora</label>
-      <select id="compania">
-        <option value="">Todas</option>
-        <option value="420">Marvel Studios</option>
-        <option value="1">Lucasfilm</option>
-        <option value="2">Walt Disney Pictures</option>
-        <option value="3">Pixar</option>
-        <option value="4">Warner Bros.</option>
-        <option value="25">20th Century Studios</option>
-        <option value="33">Universal Pictures</option>
-        <option value="5">Columbia Pictures</option>
-        <option value="2251">Sony Pictures Animation</option>
-        <option value="1632">Lionsgate</option>
-        <option value="21">Metro-Goldwyn-Mayer (MGM)</option>
-        <option value="12">New Line Cinema</option>
-        <option value="7">DreamWorks Pictures</option>
-        <option value="923">Legendary Pictures</option>
-        <option value="14">Miramax</option>
-        <option value="10201">Touchstone Pictures</option>
-        <option value="43">Searchlight Pictures</option>
-        <option value="11461">Bad Robot</option>
-        <option value="333">Blumhouse Productions</option>
-        <option value="41077">A24</option>
-        <option value="10342">Studio Ghibli</option>
-        <option value="6704">Illumination Entertainment</option>
-        <option value="6125">Walt Disney Animation Studios</option>
-        <option value="6126">Walt Disney Television Animation</option>
-      </select>      
-      <select id="orden">
-        <option value="">Ordenar por</option>
-        <option value="popularity.desc">Popularidad ↓</option>
-        <option value="popularity.asc">Popularidad ↑</option>
-        <option value="release_date.desc">Estreno ↓</option>
-        <option value="release_date.asc">Estreno ↑</option>
-        <option value="vote_average.desc">Rating ↓</option>
-        <option value="vote_average.asc">Rating ↑</option>
-      </select>
+      <div  class="filtrado">
+        <label for="compania">Genero</label>
+        <select id="genero"><option value="">Todos los géneros</option></select>
+      </div>
+      <div class="filtrado"> 
+        <label for="compania">Productora</label>
+        <select id="compania">
+          <option value="">Todas</option>
+          <option value="1">Lucasfilm</option>
+          <option value="2">Walt Disney Pictures</option>
+          <option value="3">Pixar</option>
+          <option value="4">Warner Bros.</option>
+          <option value="5">Columbia Pictures</option>
+          <option value="12">New Line Cinema</option>
+          <option value="14">Miramax</option>
+          <option value="21">Metro-Goldwyn-Mayer (MGM)</option>
+          <option value="25">20th Century Studios</option>
+          <option value="33">Universal Pictures</option>
+          <option value="34">Sony Pictures</option>
+          <option value="43">Searchlight Pictures</option>
+          <option value="174">Warner Bros Pictures</option>
+          <option value="213">A</option>
+          <option value="333">Blumhouse Productions</option>
+          <option value="420">Marvel Studios</option>
+          <option value="521">DreamWorks Animation</option>
+          <option value="923">Legendary Pictures</option>
+          <option value="1632">Lionsgate</option>
+          <option value="2251">Sony Pictures Animation</option>
+          <option value="6125">Walt Disney Animation Studios</option>
+          <option value="6126">Walt Disney Television Animation</option>
+          <option value="6704">Illumination Entertainment</option>
+          <option value="10201">Touchstone Pictures</option>
+          <option value="10342">Studio Ghibli</option>
+          <option value="11461">Bad Robot</option>
+          <option value="41077">A24</option>
+        </select>     
+      </div>
+      <div  class="filtrado">
+        <label for="ordenar">Ordenar</label>
+        <select id="orden">
+          <option value="">Ordenar por</option>
+          <option value="popularity.desc">Popularidad ↓</option>
+          <option value="popularity.asc">Popularidad ↑</option>
+          <option value="release_date.desc">Estreno ↓</option>
+          <option value="release_date.asc">Estreno ↑</option>
+          <option value="vote_average.desc">Rating ↓</option>
+          <option value="vote_average.asc">Rating ↑</option>
+        </select>
+      </div>   
+      <div  class="filtrado">
         <label for="fecha-desde">Estreno desde:</label>
         <input type="date" id="fecha-desde" />
-
+      </div>
+      <div  class="filtrado">
         <label for="fecha-hasta">Estreno hasta:</label>
         <input type="date" id="fecha-hasta" />
-
-        <div class="filtro-item full-width">
+      </div>
+      <div  class="filtrado">
+        <div class="full-width">
           <label>
             <input type="checkbox" id="filtrar-conocidas" />
-            Solo mostrar películas conocidas
+            Mostrar solo estrenos en cines de Argentina
           </label>
-        </div>        
-
-      <button id="buscar-estrenos">Buscar</button>
+        </div>    
+      </div>     
+      <div class="filtrado">
+        <button id="buscar-estrenos">Buscar</button>
+      </div>
     </section>
 
     <section id="resultados"></section>
@@ -98,10 +104,12 @@
   </main>
 
   <footer>
-    <p>© 2025 MovieFinder</p>
+    <p>© 2025 MovieNight. Lucas Messina.</p>
+    <button id="compartir-noche">🎬 Compartir esta web</button>
   </footer>
 
   <script src="scripts/estrenos.js"></script>
   <script src="scripts/responsive.js"></script>
+  <script src="scripts/trailer.js"></script>
 </body>
 </html>

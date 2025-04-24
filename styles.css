@@ -132,6 +132,22 @@ header {
   color: white;
 }
 
+.filtrado{
+  display: grid;
+  grid-template-columns: repeat(1, 1fr);
+}
+
+#compartir-noche{
+  background-color: var(--rojo);
+  color: white;
+  border: none;
+  padding: 8px 12px;
+  border-radius: 4px;
+  cursor: pointer;
+  transition: background 0.3s ease, transform 0.2s ease;
+  font-size: 14px;
+}
+
 .filtros button,
 .ver-mas,
 .ver-menos,
@@ -440,4 +456,10 @@ footer a:hover {
     opacity: 1;
     transform: translateY(0);
   }
+}
+
+input[type="checkbox"]{
+  accent-color: #0c0c0c;
+  cursor: pointer;
+  border: 1px solid #b20710;
 }

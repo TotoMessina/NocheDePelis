@@ -31,35 +31,41 @@ function cargarGeneros() {
     });
 }
 
+const COMPANIAS_CONOCIDAS = [
+  1, 2, 3, 4, 5, 6, 12, 21, 25, 33, 34, 174, 213, 420, 521, 923
+];
+
 async function buscarEstrenos(pagina = 1) {
-  resultados.innerHTML = "Cargando...";
+  resultados.innerHTML = '<div class="spinner"></div>';
   const hoy = new Date().toISOString().split("T")[0];
 
   const url = new URL(`${BASE_URL}/discover/movie`);
   url.searchParams.set("api_key", API_KEY);
   url.searchParams.set("language", "es-ES");
-  url.searchParams.set("page", pagina);
+  url.searchParams.set("region", "AR"); // Filtro por país
+  url.searchParams.set("with_release_type", "2|3"); // Solo cine o preestreno
+  url.searchParams.set("primary_release_date.gte", fechaDesde.value || hoy);
+  if (fechaHasta.value) url.searchParams.set("primary_release_date.lte", fechaHasta.value);
   url.searchParams.set("sort_by", orden.value || "release_date.asc");
-  url.searchParams.set("primary_release_date.gte", hoy);
-  if (fechaDesde.value) url.searchParams.set("primary_release_date.gte", fechaDesde.value);
-    if (fechaHasta.value) url.searchParams.set("primary_release_date.lte", fechaHasta.value);
-    if (compania.value) url.searchParams.set("with_companies", compania.value);
+  url.searchParams.set("page", pagina);
+
   if (generoSelect.value) url.searchParams.set("with_genres", generoSelect.value);
+  if (compania.value) url.searchParams.set("with_companies", compania.value);
 
-  const res = await fetch(url.toString());
-  const data = await res.json();
+  try {
+    const res = await fetch(url.toString());
+    const data = await res.json();
 
-  const filtradas = data.results.filter(p => {
-    const cumpleRating = !minRating.value || p.vote_average >= parseFloat(minRating.value);
-    const esConocida = !filtrarConocidas.checked || (p.popularity > 20 && p.vote_count > 10);
-    return cumpleRating && esConocida;
-  });  
+    const filtradas = data.results;
+    mostrarEstrenos(filtradas);
 
-  mostrarEstrenos(filtradas);
-
-  totalPaginas = data.total_pages;
-  paginaActual = pagina;
-  renderizarPaginacion();
+    totalPaginas = data.total_pages;
+    paginaActual = pagina;
+    renderizarPaginacion();
+  } catch (error) {
+    resultados.innerHTML = "<p style='text-align:center;'>Error al cargar estrenos.</p>";
+    console.error("Error en buscarEstrenos:", error);
+  }
 }
 
 function mostrarEstrenos(peliculas) {
@@ -76,6 +82,7 @@ function mostrarEstrenos(peliculas) {
         <p>Estreno: ${pelicula.release_date || "Desconocido"}</p>
         <p class="descripcion-corta">${pelicula.overview ? pelicula.overview.slice(0, 120) + "..." : "Sin descripción."}</p>
         <button class="ver-mas">Ver más</button>
+        <button class="trailer-btn">🎬 Ver tráiler</button>
         <button class="estreno-fav">⭐ Guardar</button>
       </div>
     `;
@@ -116,7 +123,7 @@ function mostrarEstrenos(peliculas) {
         btnFav.textContent = "💾 Guardado";
       }
     });
-
+    attachTrailerHandler(div, pelicula.id);
     resultados.appendChild(div);
   });
 }
